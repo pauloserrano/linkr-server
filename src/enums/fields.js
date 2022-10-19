@@ -17,8 +17,8 @@ const FIELDS = Object.freeze({
         ID: "posts.id",
         USER_ID: 'posts."userId"',
         LINK: "posts.link",
-        DESCRIPTION: "posts.description"
-        
+        DESCRIPTION: "posts.description",
+        CREATED_AT: 'posts."createdAt"'
     },
     
     HASHTAGS: {
