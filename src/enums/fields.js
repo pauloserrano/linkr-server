@@ -27,9 +27,9 @@ const FIELDS = Object.freeze({
     },
     
     POSTS_HASHTAGS: {
-        ID: "posts_hashtags.id",
-        POST_ID: 'posts_hashtags."postId"',
-        HASHTAG_ID: 'posts_hashtags."hashtagId"'
+        ID: '"postsHashtags".id',
+        POST_ID: '"postsHashtags"."postId"',
+        HASHTAG_ID: '"postsHashtags"."hashtagId"'
     },
     
     LIKES: {
