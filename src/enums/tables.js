@@ -1,5 +1,8 @@
 const TABLES = Object.freeze({
-
+    USERS: 'users',
+    SESSIONS: 'sessions'
 })
 
-export { TABLES }
+const { USERS, SESSIONS } = TABLES
+
+export { USERS, SESSIONS };
