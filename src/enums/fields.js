@@ -6,7 +6,7 @@ const FIELDS = Object.freeze({
         NAME: "name",
         PICTURE_URL: '"pictureUrl"'
     },
-
+    
     SESSIONS: {
         ID: "id",
         TOKEN: "token",
@@ -27,9 +27,9 @@ const FIELDS = Object.freeze({
     },
     
     POSTS_HASHTAGS: {
-        ID: '"id',
-        POST_ID: '""postId"',
-        HASHTAG_ID: '""hashtagId"'
+        ID: 'id',
+        POST_ID: '"postId"',
+        HASHTAG_ID: '"hashtagId"'
     },
     
     LIKES: {
@@ -39,4 +39,4 @@ const FIELDS = Object.freeze({
     }
 })
 
-export { FIELDS }
+export default FIELDS;

@@ -7,4 +7,6 @@ const TABLES = Object.freeze({
     LIKES: "likes"
 })
 
-export { TABLES }
+const { USERS, SESSIONS } = TABLES
+
+export { USERS, SESSIONS };
