@@ -1,7 +1,7 @@
 import express, { json } from "express"
 import cors from "cors"
 import dotenv from "dotenv"
-import timelineRoutes from "./routes/timeline.routes.js"
+import timelineRoutes from "./routes/posts.routes.js"
 dotenv.config()
 
 const app = express()
