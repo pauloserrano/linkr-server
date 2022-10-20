@@ -8,6 +8,6 @@ const STATUS = Object.freeze({
     CONFLICT: 409,
     UNPROCESSABLE_ENTITY: 422,
     SERVER_ERROR: 500
-});
+})
 
-export default STATUS;
+export { STATUS }

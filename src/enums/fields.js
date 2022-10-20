@@ -1,12 +1,41 @@
 const FIELDS = Object.freeze({
     USERS: {
-        EMAIL: 'email',
-        PASSWORD: 'password',
-        NAME: 'name',
+        ID: "id",
+        EMAIL: "email",
+        PASSWORD: "password",
+        NAME: "name",
         PICTURE_URL: "pictureUrl"
     },
+    
     SESSIONS: {
-        TOKEN: "token"
+        ID: "id",
+        TOKEN: "token",
+        ACTIVE: "active"
+    },
+    
+    POSTS: {
+        ID: "id",
+        USER_ID: '"userId"',
+        LINK: "link",
+        DESCRIPTION: "description"
+        
+    },
+    
+    HASHTAGS: {
+        ID: "id",
+        NAME: "name"
+    },
+    
+    POSTS_HASHTAGS: {
+        ID: 'id',
+        POST_ID: "postId",
+        HASHTAG_ID: "hashtagId"
+    },
+    
+    LIKES: {
+        ID: "id",
+        USER_ID: "userId",
+        POST_ID: "postId",
     }
 })
 

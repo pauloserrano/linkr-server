@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-import STATUS from "../enums/status.js";
+import { STATUS } from "../enums/status.js";
 import * as repository from "../repositories/auth.repository.js"; 
 import registerSchema from "../schemas/register.schema.js";
 import loginSchema from "../schemas/login.schema.js";

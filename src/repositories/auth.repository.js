@@ -2,7 +2,7 @@ import connection from "../database/db.js";
 import { USERS, SESSIONS } from "../enums/tables.js";
 import FIELDS from "../enums/fields.js";
 
-const { NAME, ID, PICTURE_URL, PASSWORD, EMAIL } = FIELDS.USERS;
+const { NAME, PICTURE_URL, PASSWORD, EMAIL } = FIELDS.USERS;
 const { TOKEN } = FIELDS.SESSIONS;
 
 const insertUser = async (name, email, hash, pictureUrl) => {
