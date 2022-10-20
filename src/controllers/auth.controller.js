@@ -19,11 +19,23 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    // generating token
+    // generating tokens
     const { userId } = res.locals;    
     const token = createToken({ userId });
-    
-    return res.status(STATUS.OK).send({ token });
+    const refreshToken = createToken({ userId }, '30d');
+
+    try {
+        const result = await repository.insertRefreshToken(refreshToken);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(STATUS.SERVER_ERROR);
+    }
+
+    return res.status(STATUS.OK).send({ token, refreshToken });
+}
+
+const newToken = async (req, res) => {
+
 }
 
 export { register, login };

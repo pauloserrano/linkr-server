@@ -16,7 +16,7 @@ const verifyNewUser = async (req, res, next) => {
     // checks if email is in use
     try {
         const conflict = await repository.selectUserByEmail(email);
-        if(conflict.rowCount != 0) return res.sendStatus(STATUS.CONFLICT);
+        if(conflict.rowCount != 0) return res.status(STATUS.CONFLICT).send("email already registered");
 
     } catch (error) {
         console.log(error);
@@ -38,10 +38,10 @@ const verifyUser = async (req, res, next) => {
     // checks user's existence and verify its password 
     try {
         const user = await repository.selectUserByEmail(email);
-        if(user.rowCount != 1) return res.sendStatus(STATUS.UNAUTHORIZED); // email not registered (no user)
+        if(user.rowCount != 1) return res.status(STATUS.UNAUTHORIZED).send("email and password dont match"); // email not registered (no user)
 
         const validLogin = bcrypt.compareSync(password, user.rows[0].password);
-        if(!validLogin) return res.sendStatus(STATUS.UNAUTHORIZED); // wrong password
+        if(!validLogin) return res.status(STATUS.UNAUTHORIZED).send("email and password dont match"); // wrong password
         
         res.locals.userId = user.rows[0].id; // id to create the login session   
     } catch (error) {
@@ -52,4 +52,33 @@ const verifyUser = async (req, res, next) => {
     next();
 }
 
-export { verifyNewUser, verifyUser };
+const verifyConnection = async (req, res, next) => {
+    // get pure token
+    const token = req.headers.authorization?.replace("Bearer ", '');
+    if(!token) return res.sendStatus(STATUS.UNAUTHORIZED);
+    console.log(token)
+
+    // check cover isnt expired or doesnt match any valid token
+    compareToken(token, (error, user) => {
+        if(error) {
+            console.log(error)
+            return res.sendStatus(STATUS.UNAUTHORIZED);
+        }
+        res.locals.user = user;
+        next(); 
+    })
+}
+
+const verifyRefreshToken = async (req, res, next) => {
+    const { refreshToken } = req.headers.refresh;
+
+    try {
+        const result = await repository.selectRefreshToken(refreshToken);
+        if(result.rowCount === 0 || !result.rows[0].active) return res.sendStatus(STATUS.UNAUTHORIZED);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(STATUS.SERVER_ERROR);
+    }
+}
+
+export { verifyNewUser, verifyUser, verifyRefreshToken };
