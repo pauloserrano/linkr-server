@@ -4,6 +4,7 @@ import { STATUS } from "../enums/status.js";
 import * as repository from "../repositories/auth.repository.js"; 
 import registerSchema from "../schemas/register.schema.js";
 import loginSchema from "../schemas/login.schema.js";
+import { compareToken } from "../controllers/controller.helper.js";
 
 const verifyNewUser = async (req, res, next) => {
     // checks if request body is correct
@@ -56,29 +57,32 @@ const verifyConnection = async (req, res, next) => {
     // get pure token
     const token = req.headers.authorization?.replace("Bearer ", '');
     if(!token) return res.sendStatus(STATUS.UNAUTHORIZED);
-    console.log(token)
 
     // check cover isnt expired or doesnt match any valid token
-    compareToken(token, (error, user) => {
-        if(error) {
+    compareToken(token, (error, tokenData) => {
+        if(error || tokenData.type != "access") {
             console.log(error)
             return res.sendStatus(STATUS.UNAUTHORIZED);
         }
-        res.locals.user = user;
+        res.locals.tokenData = tokenData;
         next(); 
     })
 }
 
 const verifyRefreshToken = async (req, res, next) => {
-    const { refreshToken } = req.headers.refresh;
+    const refreshToken = req.headers.authorization?.replace("Bearer ", '');
+    if(!refreshToken) return res.sendStatus(STATUS.UNAUTHORIZED);
 
     try {
         const result = await repository.selectRefreshToken(refreshToken);
         if(result.rowCount === 0 || !result.rows[0].active) return res.sendStatus(STATUS.UNAUTHORIZED);
+        res.locals.refreshToken = refreshToken;
     } catch (error) {
         console.log(error);
         return res.sendStatus(STATUS.SERVER_ERROR);
     }
+    
+    next();
 }
 
-export { verifyNewUser, verifyUser, verifyRefreshToken };
+export { verifyNewUser, verifyUser, verifyRefreshToken, verifyConnection };

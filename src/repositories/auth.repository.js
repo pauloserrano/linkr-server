@@ -3,7 +3,7 @@ import { USERS, SESSIONS } from "../enums/tables.js";
 import FIELDS from "../enums/fields.js";
 
 const { NAME, PICTURE_URL, PASSWORD, EMAIL } = FIELDS.USERS;
-const { TOKEN } = FIELDS.SESSIONS;
+const { ACTIVE, TOKEN } = FIELDS.SESSIONS;
 
 const insertUser = async (name, email, hash, pictureUrl) => {
     return await connection.query(`
@@ -20,9 +20,14 @@ const insertRefreshToken = async regenerationToken => {
         INSERT INTO ${SESSIONS} (${TOKEN}) VALUES ($1)`, [regenerationToken])
 }
 
-const selectRegenerationToken = async regenerationToken => {
+const selectRefreshToken = async regenerationToken => {
     return await connection.query(`
         SELECT * FROM ${SESSIONS} WHERE ${TOKEN} = $1 LIMIT 1;`, [regenerationToken]);
 }
 
-export { insertUser, selectUserByEmail, insertRefreshToken, selectRegenerationToken };
+const endSession = async refreshToken => {
+    return await connection.query(`
+        UPDATE ${SESSIONS} SET ${ACTIVE} = false WHERE ${TOKEN} = $1;`, [refreshToken]);
+}
+
+export { insertUser, selectUserByEmail, insertRefreshToken, selectRefreshToken, endSession };
