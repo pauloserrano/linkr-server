@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import { createToken } from './controller.helper.js';
 import * as repository from '../repositories/auth.repository.js';
 import { STATUS } from "../enums/status.js";
-import { USERS, SESSIONS } from '../enums/tables.js';
 
 const register = async (req, res) => {
     const { email, name, password, pictureUrl } = res.locals.user;

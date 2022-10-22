@@ -39,4 +39,4 @@ const FIELDS = Object.freeze({
     }
 })
 
-export default FIELDS;
+export { FIELDS };
