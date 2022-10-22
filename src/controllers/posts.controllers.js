@@ -3,6 +3,7 @@ import { getPosts, setPost } from "../repositories/posts.repositories.js"
 import { STATUS } from "../enums/status.js"
 
 const listPosts = async (req, res) => {
+    urlMetadata('https://trello.com/b/g2CSsUvs/linkr-sprint-1').then(console.log)
     try {
         const { rows: posts } = await getPosts()
         res.send(posts)
@@ -15,12 +16,12 @@ const listPosts = async (req, res) => {
 
 
 const insertPost = async (req, res) => {
-    const { link, description } = req.body
+    const { link, body } = req.body
     const { userId } = res.locals.user
 
     try {
         const metadata = await urlMetadata(link)
-        await setPost({ userId, link, description, metadata })
+        await setPost({ userId, link, body, metadata })
         res.sendStatus(STATUS.CREATED)
         
     } catch (error) {

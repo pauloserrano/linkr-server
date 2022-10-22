@@ -17,7 +17,10 @@ const FIELDS = Object.freeze({
         ID: "id",
         USER_ID: '"userId"',
         LINK: "link",
-        DESCRIPTION: "description",
+        BODY: "body",
+        META_TITLE: '"metaTitle"',
+        META_DESCRIPTION: '"metaDescription"',
+        META_IMAGE: '"metaImage"',
         CREATED_AT: '"createdAt"'
     },
     

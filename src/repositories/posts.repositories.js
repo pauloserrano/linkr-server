@@ -11,7 +11,10 @@ const getPosts = (offset=0, limit=20) => {
             ${TABLES.USERS}.${USERS.NAME}, 
             ${TABLES.USERS}.${USERS.PICTURE_URL}, 
             ${TABLES.POSTS}.${POSTS.LINK}, 
-            ${TABLES.POSTS}.${POSTS.DESCRIPTION} 
+            ${TABLES.POSTS}.${POSTS.BODY}, 
+            ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+            ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+            ${TABLES.POSTS}.${POSTS.META_IMAGE}
         FROM ${TABLES.POSTS} 
         JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
         ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
@@ -21,20 +24,19 @@ const getPosts = (offset=0, limit=20) => {
 }
 
 
-const setPost = ({ userId, link, description, metadata }) => {
-    // Post format suggestion
-    console.log({
-        userId,
-        link,
-        //body,
-        title: metadata.title, 
-        description: metadata.description,
-        image: metadata.image
-    })
-
+const setPost = ({ userId, link, body, metadata }) => {
     return connection.query(`
-        INSERT INTO ${TABLES.POSTS} (${POSTS.LINK}, ${POSTS.DESCRIPTION}, ${POSTS.USER_ID}) VALUES ($1, $2, $3)
-    `, [link, description, userId])
+        INSERT INTO ${TABLES.POSTS} 
+        (   
+            ${POSTS.LINK}, 
+            ${POSTS.BODY}, 
+            ${POSTS.USER_ID},
+            ${POSTS.META_TITLE},
+            ${POSTS.META_DESCRIPTION},
+            ${POSTS.META_IMAGE}
+        ) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `, [link, body, userId, metadata.title || metadata.source, metadata.description, metadata.image])
 }
 
 export { getPosts, setPost }
