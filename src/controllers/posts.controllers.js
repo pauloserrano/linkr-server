@@ -20,7 +20,7 @@ const insertPost = async (req, res) => {
 
     try {
         const metadata = await urlMetadata(link)
-        setPost({ userId, link, description, metadata })
+        await setPost({ userId, link, description, metadata })
         res.sendStatus(STATUS.CREATED)
         
     } catch (error) {
