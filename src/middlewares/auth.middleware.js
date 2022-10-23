@@ -4,6 +4,7 @@ import { STATUS } from "../enums/status.js";
 import * as repository from "../repositories/auth.repository.js"; 
 import registerSchema from "../schemas/register.schema.js";
 import loginSchema from "../schemas/login.schema.js";
+import { compareToken } from "../controllers/controller.helper.js";
 
 const verifyNewUser = async (req, res, next) => {
     // checks if request body is correct
@@ -56,7 +57,6 @@ const verifyConnection = async (req, res, next) => {
     // get pure token
     const token = req.headers.authorization?.replace("Bearer ", '');
     if(!token) return res.sendStatus(STATUS.UNAUTHORIZED);
-    console.log(token)
 
     // check cover isnt expired or doesnt match any valid token
     compareToken(token, (error, user) => {
@@ -81,4 +81,4 @@ const verifyRefreshToken = async (req, res, next) => {
     }
 }
 
-export { verifyNewUser, verifyUser, verifyRefreshToken };
+export { verifyNewUser, verifyUser, verifyRefreshToken, verifyConnection };
