@@ -1,13 +1,14 @@
 import connection from "../database/db.js";
-import { USERS, SESSIONS } from "../enums/tables.js";
-import FIELDS from "../enums/fields.js";
+import { TABLES } from "../enums/tables.js";
+import { FIELDS } from "../enums/fields.js";
 
+const { USERS, SESSIONS } = TABLES
 const { NAME, PICTURE_URL, PASSWORD, EMAIL } = FIELDS.USERS;
 const { ACTIVE, TOKEN } = FIELDS.SESSIONS;
 
 const insertUser = async (name, email, hash, pictureUrl) => {
     return await connection.query(`
-            INSERT INTO ${USERS} (${NAME}, ${EMAIL}, ${PASSWORD}, "${PICTURE_URL}") 
+            INSERT INTO ${USERS} (${NAME}, ${EMAIL}, ${PASSWORD}, ${PICTURE_URL}) 
             VALUES ($1, $2, $3, $4);`, [name, email, hash, pictureUrl]);
 }
 
