@@ -11,11 +11,15 @@ async function rankingHashtags (req, res){
         ORDER BY "usesCount" DESC`)
         
         res.send(hasUser.rows)
-        
+
     } catch (error) {
         console.log(error)
         res.sendStatus(500)
     }
 }
-
-export {rankingHashtags}
+function rankingTeste (req, res){
+    const array = ["javascript", "react", "react-native", "material", "web-dev", "mobile", "css", "html", "node", "sql"]
+      
+    setTimeout(()=>{res.send(array)}, 1000) 
+}
+export {rankingHashtags, rankingTeste}
