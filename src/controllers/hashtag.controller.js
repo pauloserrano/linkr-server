@@ -4,13 +4,16 @@ async function rankingHashtags (req, res){
 
     try {
 
-        const hasUser = await connection.query(`
-        SELECT COUNT(*) AS "usesCount", name AS "hashtagName" FROM "postsHashtags" 
-        JOIN hashtags ON "postsHashtags"."hashtagId"= hashtags.id 
+        let rankingArray = await connection.query(`
+        SELECT hashtags.name, COUNT (*) AS "usesCount"
+        FROM "postsHashtags" 
+        JOIN hashtags ON "postsHashtags"."hashtagId" = hashtags.id
         GROUP BY hashtags.name
         ORDER BY "usesCount" DESC`)
+
+        rankingArray = rankingArray.rows.map(e => e.name)
         
-        res.send(hasUser.rows)
+        res.send(rankingArray)
 
     } catch (error) {
         console.log(error)
@@ -26,14 +29,23 @@ async function searchHashtagPost (req, res) {
     try {
         /*
         const hasHashtag = await connection.query(`SELECT * FROM hashtags WHERE name=$1`, [req.params.hashtag])
-
+        
         if(hasHashtag.rows[0]){
             res.send("tem hashtag")
         }
         */
-        const teste = await connection.query(`SELECT * FROM posts WHERE "userId"=$1 ORDER BY id ASC;`, [1])
-        const teste2 = teste.rows[0]
-        res.send(teste2)
+        const hashtagName = req.params?.hashtag
+
+        const hashtagArray = await connection.query(`
+        SELECT posts.link, posts.body, posts."userId",posts."metaTitle",posts."metaDescription",posts."metaImage",users."pictureUrl"
+        FROM "postsHashtags" 
+        JOIN hashtags ON "postsHashtags"."hashtagId" = hashtags.id
+        JOIN posts ON "postsHashtags"."postId" = posts.id
+        JOIN users ON posts."userId" = users.id
+        WHERE hashtags.name=$1;
+        `, [hashtagName])
+
+        res.send(hashtagArray.rows)
 
     } catch (error) {
         console.log(error)

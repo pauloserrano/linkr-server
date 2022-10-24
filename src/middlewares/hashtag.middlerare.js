@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
 
 async function headersHashtagMiddleware (req, res, next){
-
+    /*
     if (!req.headers.authorization?.includes("Bearer ")) {
         res.sendStatus(401)
     }
@@ -30,6 +30,8 @@ async function headersHashtagMiddleware (req, res, next){
         console.log(error)
         res.sendStatus(500)
     }
+    */
+   next()
 }
 
 export {headersHashtagMiddleware}
