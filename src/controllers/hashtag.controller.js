@@ -37,7 +37,7 @@ async function searchHashtagPost (req, res) {
         const hashtagName = req.params?.hashtag
 
         const hashtagArray = await connection.query(`
-        SELECT posts.link, posts.body, posts."userId",posts."metaTitle",posts."metaDescription",posts."metaImage",users."pictureUrl"
+        SELECT posts.link, posts.body, posts."userId",posts."metaTitle",posts."metaDescription",posts."metaImage",users."pictureUrl",posts.id
         FROM "postsHashtags" 
         JOIN hashtags ON "postsHashtags"."hashtagId" = hashtags.id
         JOIN posts ON "postsHashtags"."postId" = posts.id
