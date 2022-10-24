@@ -24,11 +24,16 @@ function rankingTeste (req, res){
 }
 async function searchHashtagPost (req, res) {
     try {
-        
-        let teste = await connection.query(`SELECT * FROM posts`)
-        
-        teste = teste.rows[0].body.split(" ").filter(e => e.includes("#") && e[0] === "#")
-        res.send(teste)
+        /*
+        const hasHashtag = await connection.query(`SELECT * FROM hashtags WHERE name=$1`, [req.params.hashtag])
+
+        if(hasHashtag.rows[0]){
+            res.send("tem hashtag")
+        }
+        */
+        const teste = await connection.query(`SELECT * FROM posts WHERE "userId"=$1 ORDER BY id ASC;`, [1])
+        const teste2 = teste.rows[0]
+        res.send(teste2)
 
     } catch (error) {
         console.log(error)
