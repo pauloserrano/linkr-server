@@ -1,4 +1,5 @@
 import connection from "../database/db.js";
+import {formatWhoLike} from "../repositories/like.repository.js"
 
 async function likeAmount (req, res){
 
@@ -20,8 +21,10 @@ async function likeAmount (req, res){
 
         if (isLiked?.rows[0]) {isLiked = true} 
         else {isLiked = false}
+
+        const whoLiked = await formatWhoLike({postId, isLiked})
     
-        res.send({likeAmount, isLiked})
+        res.send({likeAmount, isLiked, whoLiked})
 
     } catch (error) {
         console.log(error)
@@ -56,5 +59,9 @@ async function removeLike (req, res){
         res.sendStatus(500)
     }
 }
+async function teste (req,res){
+    const teste = await formatWhoLike({postId:1, isLiked:true})
+    res.send(teste)
+}
 
-export {likeAmount, insertLike, removeLike}
+export {likeAmount, insertLike, removeLike, teste}
