@@ -18,7 +18,7 @@ const listPosts = async (req, res) => {
 
 const insertPost = async (req, res) => {
     const { link, body } = req.body
-    const { userId } = res.locals.user
+    const { userId } = res.locals.tokenData
 
     try {
         const metadata = await urlMetadata(link)
