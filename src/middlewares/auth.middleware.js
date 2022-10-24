@@ -58,10 +58,10 @@ const verifyConnection = async (req, res, next) => {
     const token = req.headers.authorization?.replace("Bearer ", '');
     if(!token) return res.sendStatus(STATUS.UNAUTHORIZED);
 
-    // check cover isnt expired or doesnt match any valid token
+    // check token isnt expired or doesnt match any valid token
     compareToken(token, (error, tokenData) => {
         if(error || tokenData.type != "access") {
-            console.log(error)
+            console.log(error);
             return res.sendStatus(STATUS.UNAUTHORIZED);
         }
         res.locals.tokenData = tokenData;
@@ -70,10 +70,12 @@ const verifyConnection = async (req, res, next) => {
 }
 
 const verifyRefreshToken = async (req, res, next) => {
+    // get pure token
     const refreshToken = req.headers.authorization?.replace("Bearer ", '');
     if(!refreshToken) return res.sendStatus(STATUS.UNAUTHORIZED);
 
     try {
+        //  check token isnt expired, inactive or doesnt match any valid token
         const result = await repository.selectRefreshToken(refreshToken);
         if(result.rowCount === 0 || !result.rows[0].active) return res.sendStatus(STATUS.UNAUTHORIZED);
         res.locals.refreshToken = refreshToken;

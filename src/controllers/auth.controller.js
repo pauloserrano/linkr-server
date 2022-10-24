@@ -45,6 +45,21 @@ const logout = async (req, res) => {
     }
 }
 
+const sendUserdata = async (req, res) => {
+    const { userId } = res.locals.tokenData;
+    
+    try {
+        const user = await repository.selectUserById(userId);
+        if(user.rowCount != 1) return res.sendStatus(STATUS.NOT_FOUND);
+        
+        return res.status(STATUS.OK).send(user.rows[0]);
+
+    } catch (error) {
+        console.error(error);
+        return res.sendStatus(STATUS.SERVER_ERROR);
+    }
+}
+
 const sendNewToken = (req, res) => {
     const { refreshToken } = res.locals;
     
@@ -59,4 +74,4 @@ const sendNewToken = (req, res) => {
     })
 }
 
-export { register, login, sendNewToken, logout };
+export { register, login, sendUserdata, sendNewToken, logout };
