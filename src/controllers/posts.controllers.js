@@ -1,5 +1,6 @@
 import urlMetadata from "url-metadata"
 import { getPosts, setPost } from "../repositories/posts.repositories.js"
+import { setHashtagArray } from "../repositories/hashtag.repository.js"
 import { STATUS } from "../enums/status.js"
 
 const listPosts = async (req, res) => {
@@ -22,6 +23,7 @@ const insertPost = async (req, res) => {
     try {
         const metadata = await urlMetadata(link)
         await setPost({ userId, link, body, metadata })
+        await setHashtagArray({body, userId})
         res.sendStatus(STATUS.CREATED)
         
     } catch (error) {
