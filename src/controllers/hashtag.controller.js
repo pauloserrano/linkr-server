@@ -22,4 +22,17 @@ function rankingTeste (req, res){
       
     setTimeout(()=>{res.send(array)}, 1000) 
 }
-export {rankingHashtags, rankingTeste}
+async function searchHashtagPost (req, res) {
+    try {
+        
+        let teste = await connection.query(`SELECT * FROM posts`)
+        
+        teste = teste.rows[0].body.split(" ").filter(e => e.includes("#") && e[0] === "#")
+        res.send(teste)
+
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+export {rankingHashtags, rankingTeste, searchHashtagPost}

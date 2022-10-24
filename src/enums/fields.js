@@ -1,42 +1,45 @@
 const FIELDS = Object.freeze({
     USERS: {
-        ID: "users.id",
-        EMAIL: "users.email",
-        PASSWORD: "users.password",
-        NAME: "users.name",
-        PICTURE_URL: 'users."pictureUrl"'
+        ID: "id",
+        EMAIL: "email",
+        PASSWORD: "password",
+        NAME: "name",
+        PICTURE_URL: '"pictureUrl"'
     },
-
+    
     SESSIONS: {
-        ID: "sessions.id",
-        TOKEN: "sessions.token",
-        ACTIVE: "sessions.active"
+        ID: "id",
+        TOKEN: "token",
+        ACTIVE: "active"
     },
     
     POSTS: {
-        ID: "posts.id",
-        USER_ID: 'posts."userId"',
-        LINK: "posts.link",
-        DESCRIPTION: "posts.description"
-        
+        ID: "id",
+        USER_ID: '"userId"',
+        LINK: "link",
+        BODY: "body",
+        META_TITLE: '"metaTitle"',
+        META_DESCRIPTION: '"metaDescription"',
+        META_IMAGE: '"metaImage"',
+        CREATED_AT: '"createdAt"'
     },
     
     HASHTAGS: {
-        ID: "hashtags.id",
-        NAME: "hashtags.name"
+        ID: "id",
+        NAME: "name"
     },
     
     POSTS_HASHTAGS: {
-        ID: '"postsHashtags".id',
-        POST_ID: '"postsHashtags"."postId"',
-        HASHTAG_ID: '"postsHashtags"."hashtagId"'
+        ID: 'id',
+        POST_ID: '"postId"',
+        HASHTAG_ID: '"hashtagId"'
     },
     
     LIKES: {
-        ID: "likes.id",
-        USER_ID: 'likes."userId"',
-        POST_ID: 'likes."postId"',
+        ID: "id",
+        USER_ID: '"userId"',
+        POST_ID: '"postId"',
     }
 })
 
-export { FIELDS }
+export { FIELDS };
