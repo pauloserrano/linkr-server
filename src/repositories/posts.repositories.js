@@ -55,4 +55,12 @@ const deletePost = ({ id }) => {
     `, [id])
 }
 
-export { getPost, getPosts, setPost, deletePost }
+const updatePost = ({ id, body }) => {
+    return connection.query(`
+        UPDATE ${TABLES.POSTS}
+        SET ${POSTS.BODY} = $1
+        WHERE ${POSTS.ID} = $2;
+    `, [body, id])
+}
+
+export { getPost, getPosts, setPost, deletePost, updatePost }
