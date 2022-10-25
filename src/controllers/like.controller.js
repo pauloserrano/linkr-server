@@ -4,6 +4,7 @@ import {formatWhoLike} from "../repositories/like.repository.js"
 async function likeAmount (req, res){
 
     const postId = req.params?.postId
+    const userId = 1
 
     try {
 
@@ -17,14 +18,14 @@ async function likeAmount (req, res){
         if (likeAmount?.rows[0]?.likeAmount){likeAmount = likeAmount.rows[0].likeAmount}
         else {likeAmount = 0}
 
-        let isLiked = await connection.query(`SELECT * FROM likes WHERE "postId"=$1 AND "userId"=$2`,[postId, 1])
+        let isLiked = await connection.query(`SELECT * FROM likes WHERE "postId"=$1 AND "userId"=$2`,[postId, userId])
 
         if (isLiked?.rows[0]) {isLiked = true} 
         else {isLiked = false}
 
-        const whoLiked = await formatWhoLike({postId, isLiked})
+        const whoLiked = await formatWhoLike({postId, isLiked, userId})
     
-        res.send({likeAmount, isLiked, whoLiked})
+        res.send({likeAmount, isLiked, whoLiked: whoLiked})
 
     } catch (error) {
         console.log(error)
