@@ -44,7 +44,7 @@ const verifyUser = async (req, res, next) => {
         const validLogin = bcrypt.compareSync(password, user.rows[0].password);
         if(!validLogin) return res.status(STATUS.UNAUTHORIZED).send("email and password dont match"); // wrong password
         
-        res.locals.userId = user.rows[0].id; // id to create the login session   
+        res.locals.user = user.rows[0]; // id to create the login session   
     } catch (error) {
         console.log(error);
         return res.sendStatus(STATUS.SERVER_ERROR);

@@ -19,7 +19,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     // generating tokens
-    const { userId } = res.locals;    
+    const { id: userId, name, pictureUrl } = res.locals.user;
     const token = createToken({ userId, type: "access" });
     const refreshToken = createToken({ userId, type: "refresh" }, '30d');
 
@@ -30,7 +30,7 @@ const login = async (req, res) => {
         return res.sendStatus(STATUS.SERVER_ERROR);
     }
 
-    return res.status(STATUS.OK).send({ token, refreshToken });
+    return res.status(STATUS.OK).send({ token, refreshToken, user: { userId, name, pictureUrl } });
 }
 
 const logout = async (req, res) => {

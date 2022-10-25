@@ -1,4 +1,5 @@
 import urlMetadata from "url-metadata"
+import jwt from "jsonwebtoken"
 import { getPost, getPosts, setPost, deletePost } from "../repositories/posts.repositories.js"
 import { setHashtagArray } from "../repositories/hashtag.repository.js"
 import { STATUS } from "../enums/status.js"
@@ -35,7 +36,7 @@ const insertPost = async (req, res) => {
 
 const removePost = async (req, res) => {
     const { id } = req.params
-    const { userId } = res.locals.user
+    const { userId } = res.locals.tokenData
 
     try {
         const { rows: [ post ] } = await getPost({ id })

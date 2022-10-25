@@ -15,6 +15,7 @@ const getPosts = (offset=0, limit=20) => {
     return connection.query(`
         SELECT 
             ${TABLES.POSTS}.${POSTS.ID}, 
+            ${TABLES.POSTS}.${POSTS.USER_ID},
             ${TABLES.USERS}.${USERS.NAME}, 
             ${TABLES.USERS}.${USERS.PICTURE_URL}, 
             ${TABLES.POSTS}.${POSTS.LINK}, 
