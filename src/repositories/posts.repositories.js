@@ -6,7 +6,8 @@ const { USERS, POSTS } = FIELDS
 
 const getPosts = (offset=0, limit=20) => {
     return connection.query(`
-        SELECT 
+        SELECT
+            ${TABLES.POSTS}.${POSTS.USER_ID},
             ${TABLES.POSTS}.${POSTS.ID}, 
             ${TABLES.USERS}.${USERS.NAME}, 
             ${TABLES.USERS}.${USERS.PICTURE_URL}, 

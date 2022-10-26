@@ -6,7 +6,7 @@ const searchUsers = async (req, res) => {
     
     try {
         const matchedUsers = await repository.selectUsersByNamePart(namePart);
-        return res.status(STATUS.OK).send((matchedUsers.rows))
+        return res.status(STATUS.OK).send(({ profiles: matchedUsers.rows }))
     } catch (error) {
         console.error(error);
         return res.sendStatus(STATUS.SERVER_ERROR);
