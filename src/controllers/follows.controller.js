@@ -3,18 +3,21 @@ import connection from "../database/db.js";
 async function followsById (req, res){
 
     const { userId } = res.locals.tokenData
+    const { followedId } = req.params
 
     try {
 
-        let rankingArray = await connection.query(`
+        const hasFollow = await connection.query(`
         SELECT *
         FROM follows
-        WHERE "userId"=$1
-        `, [userId])
+        WHERE "userId"=$1 AND "followedId"=$2
+        `, [userId, followedId])
 
-        rankingArray = rankingArray.rows.map(e => e.name)
-        
-        res.send(rankingArray)
+        if (hasFollow.rows[0] === undefined){
+            return res.send(false)
+        } else {
+            return res.send(true)
+        }
 
     } catch (error) {
         console.log(error)

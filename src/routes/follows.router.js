@@ -5,7 +5,7 @@ import { followVerify } from "../middlewares/follows.middleware.js";
 
 const router = express.Router()
 
-router.get("/follows/:id", followsById)
+router.get("/follows/:followedId", verifyConnection, followsById)
 router.post("/follow",verifyConnection, followVerify ,followInsert)
 
 export default router
