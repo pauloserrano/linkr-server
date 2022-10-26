@@ -6,6 +6,7 @@ import timelineRoutes from "./routes/posts.routes.js"
 import authRouter from "./routes/auth.router.js"
 import likeRoute from "./routes/likes.router.js"
 import userRoute from "./routes/user.router.js"
+import followsRoute from "./routes/follows.router.js"
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ app.use(authRouter);
 app.use(timelineRoutes)
 app.use(likeRoute)
 app.use(userRoute)
+app.use(followsRoute)
 
 app.get('/status', (req, res) => {
     res.send('OK')
