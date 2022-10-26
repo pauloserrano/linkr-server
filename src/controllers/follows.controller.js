@@ -49,7 +49,8 @@ async function followInsert (req, res){
     try {
 
         await connection.query(`INSERT INTO follows ("userId", "followedId") VALUES ($1, $2)`, [userId, followedId])
-        res.sendStatus(200)
+
+        setTimeout(() => {res.sendStatus(200)}, 300);
 
     } catch (error) {
         
@@ -58,5 +59,22 @@ async function followInsert (req, res){
     }   
 
 }
+async function followRemove (req, res){
 
-export {followsById, followInsert, allFollows}
+    const { userId } = res.locals.tokenData
+    const { followedId } = req.params
+
+    try {
+
+        await connection.query(`DELETE FROM follows WHERE "userId"=$1 AND "followedId"=$2`, [userId, followedId])
+
+        setTimeout(() => {res.sendStatus(200)}, 300);
+        
+
+    } catch (error) {
+        
+        console.log(error)
+        res.sendStatus(500)
+    }  
+}
+export {followsById, followInsert, allFollows, followRemove}
