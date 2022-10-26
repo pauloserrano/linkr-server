@@ -4,7 +4,8 @@ const TABLES = Object.freeze({
     POSTS: "posts",
     HASHTAGS: "hashtags",
     POSTS_HASHTAGS: "posts_hashtags",
-    LIKES: "likes"
+    LIKES: "likes",
+    COMMENTS: "comments"
 })
 
 export { TABLES };

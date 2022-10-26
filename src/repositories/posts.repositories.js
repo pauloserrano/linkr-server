@@ -2,7 +2,7 @@ import connection from "../database/db.js"
 import { TABLES } from "../enums/tables.js"
 import { FIELDS } from "../enums/fields.js"
 
-const { USERS, POSTS } = FIELDS
+const { USERS, POSTS, COMMENTS } = FIELDS
 
 const getPost = ({ id }) => {
     return connection.query(`
@@ -63,4 +63,28 @@ const updatePost = ({ id, body }) => {
     `, [body, id])
 }
 
-export { getPost, getPosts, setPost, deletePost, updatePost }
+const getComments = ({ id }) => {
+    return connection.query(`
+        SELECT 
+            ${TABLES.USERS}.${USERS.PICTURE_URL},
+            ${TABLES.USERS}.${USERS.NAME},
+            ${TABLES.COMMENTS}.${COMMENTS.BODY}
+        FROM ${TABLES.COMMENTS} 
+        JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.COMMENTS}.${COMMENTS.USER_ID}
+        WHERE ${TABLES.COMMENTS}.${COMMENTS.POST_ID} = $1;
+    `, [id])
+}
+
+const setComment = ({ id, userId, body }) => {
+    return connection.query(`
+        INSERT INTO ${TABLES.COMMENTS} 
+        (
+            ${COMMENTS.USER_ID},
+            ${COMMENTS.POST_ID},
+            ${COMMENTS.BODY}
+        )
+        VALUES ($1, $2, $3);
+    `, [userId, id, body])
+}
+
+export { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment }

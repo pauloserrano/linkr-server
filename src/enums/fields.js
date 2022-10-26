@@ -39,6 +39,14 @@ const FIELDS = Object.freeze({
         ID: "id",
         USER_ID: '"userId"',
         POST_ID: '"postId"',
+    },
+
+    COMMENTS: {
+        ID: "id",
+        USER_ID: '"userId"',
+        POST_ID: '"postId"',
+        BODY: "body",
+        CREATED_AT: '"createdAt"'
     }
 })
 
