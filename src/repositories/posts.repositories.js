@@ -4,10 +4,18 @@ import { FIELDS } from "../enums/fields.js"
 
 const { USERS, POSTS } = FIELDS
 
+const getPost = ({ id }) => {
+    return connection.query(`
+        SELECT * FROM ${TABLES.POSTS} 
+        WHERE ${POSTS.ID} = $1;
+    `, [id])
+}
+
 const getPosts = (offset=0, limit=20) => {
     return connection.query(`
         SELECT 
             ${TABLES.POSTS}.${POSTS.ID}, 
+            ${TABLES.POSTS}.${POSTS.USER_ID},
             ${TABLES.USERS}.${USERS.NAME}, 
             ${TABLES.USERS}.${USERS.PICTURE_URL}, 
             ${TABLES.POSTS}.${POSTS.LINK}, 
@@ -24,7 +32,7 @@ const getPosts = (offset=0, limit=20) => {
 }
 
 
-const setPost = ({ userId, link, body, metadata }) => {
+const setPost = ({ userId, link, body, metadata: { title, source, description, image } }) => {
     return connection.query(`
         INSERT INTO ${TABLES.POSTS} 
         (   
@@ -36,7 +44,15 @@ const setPost = ({ userId, link, body, metadata }) => {
             ${POSTS.META_IMAGE}
         ) 
         VALUES ($1, $2, $3, $4, $5, $6)
-    `, [link, body, userId, metadata.title || metadata.source, metadata.description, metadata.image])
+    `, [link, body, userId, title || source, description, image])
 }
 
-export { getPosts, setPost }
+
+const deletePost = ({ id }) => {
+    return connection.query(`
+        DELETE FROM ${TABLES.POSTS}
+        WHERE ${POSTS.ID} = $1;
+    `, [id])
+}
+
+export { getPost, getPosts, setPost, deletePost }
