@@ -2,7 +2,7 @@ import connection from "../database/db.js"
 import { TABLES } from "../enums/tables.js"
 import { FIELDS } from "../enums/fields.js"
 
-const { USERS, POSTS, COMMENTS } = FIELDS
+const { USERS, POSTS, COMMENTS, LIKES, POSTS_HASHTAGS, SHARED } = FIELDS
 
 const getPost = ({ id }) => {
     return connection.query(`
@@ -47,12 +47,41 @@ const setPost = ({ userId, link, body, metadata: { title, source, description, i
     `, [link, body, userId, title || source, description, image])
 }
 
+const deleteLikes = ({ id }) => {
+    return connection.query(`   
+        DELETE FROM ${TABLES.LIKES}
+        WHERE ${LIKES.POST_ID} = $1;
+    `, id)
+}
+
 
 const deletePost = ({ id }) => {
-    return connection.query(`
-        DELETE FROM ${TABLES.POSTS}
-        WHERE ${POSTS.ID} = $1;
-    `, [id])
+    return [
+        connection.query(`
+            DELETE FROM ${TABLES.LIKES}
+            WHERE ${LIKES.POST_ID} = $1;
+        `, [id]),
+        
+        connection.query(`
+            DELETE FROM ${TABLES.POSTS_HASHTAGS}
+            WHERE ${POSTS_HASHTAGS.POST_ID} = $1;
+        `, [id]),
+
+        connection.query(`
+            DELETE FROM ${TABLES.COMMENTS}
+            WHERE ${COMMENTS.POST_ID} = $1;
+        `, [id]),
+
+        connection.query(`
+            DELETE FROM ${TABLES.SHARED}
+            WHERE ${SHARED.POST_ID} = $1;
+        `, [id]),
+
+        connection.query(`
+            DELETE FROM ${TABLES.POSTS}
+            WHERE ${POSTS.ID} = $1;
+        `, [id]),
+    ]
 }
 
 const updatePost = ({ id, body }) => {
@@ -71,7 +100,8 @@ const getComments = ({ id }) => {
             ${TABLES.COMMENTS}.${COMMENTS.BODY}
         FROM ${TABLES.COMMENTS} 
         JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.COMMENTS}.${COMMENTS.USER_ID}
-        WHERE ${TABLES.COMMENTS}.${COMMENTS.POST_ID} = $1;
+        WHERE ${TABLES.COMMENTS}.${COMMENTS.POST_ID} = $1
+        ORDER BY ${TABLES.COMMENTS}.${COMMENTS.CREATED_AT} DESC;
     `, [id])
 }
 

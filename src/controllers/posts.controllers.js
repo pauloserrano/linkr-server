@@ -50,7 +50,7 @@ const removePost = async (req, res) => {
             return
         }
 
-        await deletePost({ id })
+        await Promise.all(deletePost({ id }))
         res.sendStatus(STATUS.OK)
 
     } catch (error) {
