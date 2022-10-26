@@ -1,5 +1,21 @@
 import connection from "../database/db.js";
 
+async function allFollows (req, res){
+
+    const { userId } = res.locals.tokenData
+
+    try {
+        
+        const followsArray = await connection.query(`SELECT * FROM follows WHERE "userId"=$1`, [userId])
+
+        res.send(followsArray)
+
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+
 async function followsById (req, res){
 
     const { userId } = res.locals.tokenData
@@ -43,4 +59,4 @@ async function followInsert (req, res){
 
 }
 
-export {followsById, followInsert}
+export {followsById, followInsert, allFollows}
