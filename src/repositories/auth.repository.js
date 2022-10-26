@@ -18,7 +18,7 @@ const selectUserByEmail = async email => {
 
 const selectUserById = async userId => {
     return await connection.query(`
-        SELECT u.${PICTURE_URL}, u.${NAME}, u.${EMAIL} FROM ${USERS} u WHERE ${ID} = $1 LIMIT 1;`, [userId]);
+        SELECT u.${PICTURE_URL}, u.${NAME}, u.${ID} FROM ${USERS} u WHERE ${ID} = $1 LIMIT 1;`, [userId]);
 }
 
 const insertRefreshToken = async regenerationToken => {
