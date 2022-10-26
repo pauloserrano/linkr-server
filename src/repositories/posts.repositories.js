@@ -20,11 +20,14 @@ const getPosts = (offset=0, limit=20) => {
             ${TABLES.USERS}.${USERS.PICTURE_URL}, 
             ${TABLES.POSTS}.${POSTS.LINK}, 
             ${TABLES.POSTS}.${POSTS.BODY}, 
+            COUNT(${TABLES.POSTS}.${POSTS.ID}) - 1 AS reposts,
             ${TABLES.POSTS}.${POSTS.META_TITLE}, 
             ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
             ${TABLES.POSTS}.${POSTS.META_IMAGE}
         FROM ${TABLES.POSTS} 
         JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
+        LEFT JOIN ${TABLES.SHARED} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID} 
+        GROUP BY ${TABLES.POSTS}.${POSTS.ID}, ${TABLES.USERS}.${USERS.ID}
         ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
         LIMIT $1
         OFFSET $2;
@@ -117,4 +120,15 @@ const setComment = ({ id, userId, body }) => {
     `, [userId, id, body])
 }
 
-export { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment }
+const insertRepost = ({ id, userId }) => {
+    return connection.query(`
+        INSERT INTO ${TABLES.SHARED}
+        (
+            ${SHARED.POST_ID},
+            ${SHARED.USER_ID}
+        )
+        VALUES ($1, $2);
+    `,[id, userId])
+}
+
+export { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment, insertRepost }
