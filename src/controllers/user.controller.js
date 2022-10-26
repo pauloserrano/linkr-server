@@ -13,9 +13,9 @@ async function UserPosts (req, res){
         WHERE posts."userId"=$1;
         `
         , [userId])
-        const userName = await connection.query(`SELECT users.name FROM users WHERE id=$1`, [userId])
+        const userName = await connection.query(`SELECT users.name, users."pictureUrl" FROM users WHERE id=$1`, [userId])
 
-        res.send({postArray:userPosts.rows, userName:userName.rows[0]?.name})
+        res.send({postArray:userPosts.rows, userName:userName.rows[0]?.name, userPictureUrl:userPosts.rows[0]?.pictureUrl})
 
     } catch (error) {
         console.log(error)
