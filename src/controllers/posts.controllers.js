@@ -4,8 +4,10 @@ import { setHashtagArray } from "../repositories/hashtag.repository.js"
 import { STATUS } from "../enums/status.js"
 
 const listPosts = async (req, res) => {
+    const { userId } = res.locals.tokenData
+
     try {
-        const { rows: posts } = await getPosts()
+        const { rows: posts } = await getPosts({ userId })
         res.send(posts)
         
     } catch (error) {

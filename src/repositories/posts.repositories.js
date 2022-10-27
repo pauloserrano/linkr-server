@@ -2,7 +2,7 @@ import connection from "../database/db.js"
 import { TABLES } from "../enums/tables.js"
 import { FIELDS } from "../enums/fields.js"
 
-const { USERS, POSTS, COMMENTS, LIKES, POSTS_HASHTAGS, SHARED } = FIELDS
+const { USERS, POSTS, COMMENTS, LIKES, POSTS_HASHTAGS, SHARED, FOLLOWS } = FIELDS
 
 const getPost = ({ id }) => {
     return connection.query(`
@@ -19,7 +19,7 @@ const getRepost = ({ id }) => {
     `, [id])
 }
 
-const getPosts = (offset=0, limit=20) => {
+const getPosts = ({ userId, offset, limit }) => {
     return connection.query(`
         SELECT 
             ${POSTS.ID},
@@ -52,6 +52,8 @@ const getPosts = (offset=0, limit=20) => {
                 CASE WHEN TRUE THEN FALSE END AS "isRepost"
             FROM ${TABLES.POSTS} 
             JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.POSTS}.${POSTS.USER_ID}
+            JOIN ${TABLES.FOLLOWS} ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.POSTS}.${POSTS.USER_ID}-- OR posts."userId" = $1
+            WHERE ${TABLES.FOLLOWS}.${FOLLOWS.USER_ID} = $1
         UNION
             SELECT 
                 ${TABLES.POSTS}.${POSTS.ID}, 
@@ -71,11 +73,13 @@ const getPosts = (offset=0, limit=20) => {
             FROM ${TABLES.SHARED}
             JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.SHARED}.${SHARED.USER_ID}
             JOIN ${TABLES.POSTS} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID}
+            JOIN ${TABLES.FOLLOWS} ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.POSTS}.${POSTS.USER_ID}-- OR posts."userId" = $1
+            WHERE ${TABLES.FOLLOWS}.${FOLLOWS.USER_ID} = $1
         ) AS timeline 
         ORDER BY timeline.timestamp DESC
-        LIMIT $1
-        OFFSET $2;
-    `, [limit, offset])
+        LIMIT $2
+        OFFSET $3;
+    `, [userId, limit || 20, offset || 0])
 }
 
 

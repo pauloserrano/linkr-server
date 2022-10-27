@@ -5,7 +5,7 @@ import { validatePost } from "../middlewares/posts.middlewares.js";
 
 const router = Router()
 
-router.get('/timeline', listPosts)
+router.get('/timeline', verifyConnection, listPosts)
 router.post('/post', verifyConnection, validatePost, insertPost)
 router.delete('/post/:id', verifyConnection, removePost)
 router.patch('/post/:id', verifyConnection, modifyPost)
