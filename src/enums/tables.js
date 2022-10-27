@@ -3,8 +3,10 @@ const TABLES = Object.freeze({
     SESSIONS: "sessions",
     POSTS: "posts",
     HASHTAGS: "hashtags",
-    POSTS_HASHTAGS: "posts_hashtags",
-    LIKES: "likes"
+    POSTS_HASHTAGS: '"postsHashtags"',
+    LIKES: "likes",
+    COMMENTS: "comments",
+    SHARED: "shared"
 })
 
 export { TABLES };
