@@ -1,5 +1,5 @@
 import urlMetadata from "url-metadata"
-import { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment, insertRepost } from "../repositories/posts.repositories.js"
+import { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment, insertRepost, deleteRepost, getRepost } from "../repositories/posts.repositories.js"
 import { setHashtagArray } from "../repositories/hashtag.repository.js"
 import { STATUS } from "../enums/status.js"
 
@@ -135,4 +135,29 @@ const repostPost = async (req, res) => {
     }
 }
 
-export { listPosts, insertPost, removePost, modifyPost, listComments, insertComment, repostPost }
+const removeRepost = async (req, res) => {
+    const { id } = req.params
+    const { userId } = res.locals.tokenData
+
+    try {
+        const { rows: [ repost ] } = await getRepost({ id })
+
+        if (!repost){
+            res.sendStatus(STATUS.NOT_FOUND)
+            return
+        }
+
+        if (repost.userId !== userId){
+            res.sendStatus(STATUS.UNAUTHORIZED)
+            return
+        }
+        await deleteRepost({ id })
+        res.sendStatus(STATUS.OK)
+
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(STATUS.SERVER_ERROR)
+    }
+}
+
+export { listPosts, insertPost, removePost, modifyPost, listComments, insertComment, repostPost, removeRepost }

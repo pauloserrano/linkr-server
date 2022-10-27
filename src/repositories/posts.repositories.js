@@ -11,6 +11,14 @@ const getPost = ({ id }) => {
     `, [id])
 }
 
+
+const getRepost = ({ id }) => {
+    return connection.query(`
+        SELECT * FROM ${TABLES.SHARED} 
+        WHERE ${SHARED.ID} = $1;
+    `, [id])
+}
+
 const getPosts = (offset=0, limit=20) => {
     return connection.query(`
         SELECT 
@@ -23,7 +31,8 @@ const getPosts = (offset=0, limit=20) => {
             ${POSTS.META_IMAGE},   
             ${USERS.NAME},
             ${USERS.PICTURE_URL},
-            reposts,
+            "repostId",
+            "reposts",
             "isRepost"
         FROM (
             SELECT 
@@ -39,6 +48,7 @@ const getPosts = (offset=0, limit=20) => {
                 ${TABLES.POSTS}.${POSTS.CREATED_AT} AS timestamp,
                 (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
                 WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN 0 END AS "repostId",
                 CASE WHEN TRUE THEN FALSE END AS "isRepost"
             FROM ${TABLES.POSTS} 
             JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.POSTS}.${POSTS.USER_ID}
@@ -56,6 +66,7 @@ const getPosts = (offset=0, limit=20) => {
                 ${TABLES.SHARED}.${SHARED.CREATED_AT} AS timestamp,
                 (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
                 WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN ${TABLES.SHARED}.${SHARED.ID} END AS "repostId",
                 CASE WHEN TRUE THEN TRUE END AS "isRepost"
             FROM ${TABLES.SHARED}
             JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.SHARED}.${SHARED.USER_ID}
@@ -164,4 +175,21 @@ const insertRepost = ({ id, userId }) => {
     `,[id, userId])
 }
 
-export { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment, insertRepost }
+const deleteRepost = ({ id }) => {
+    return connection.query(`
+        DELETE FROM ${TABLES.SHARED} WHERE ${SHARED.ID} = $1;
+    `, [id])
+}
+
+export { 
+    getPost, 
+    getPosts, 
+    setPost, 
+    deletePost, 
+    updatePost, 
+    getComments, 
+    setComment, 
+    insertRepost, 
+    deleteRepost,
+    getRepost
+}
