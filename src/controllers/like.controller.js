@@ -6,7 +6,6 @@ async function likeAmount (req, res){
     const postId = req.params?.postId
     const { userId } = res.locals.tokenData
 
-
     try {
 
         let likeAmount = await connection.query(`
@@ -43,6 +42,7 @@ async function insertLike (req, res){
     try {   
         
         await connection.query(`INSERT INTO likes ("postId", "userId") VALUES ($1, $2)`, [postId, userId])
+        res.sendStatus(200)
 
     } catch (error) {
         console.log(error)
@@ -57,6 +57,7 @@ async function removeLike (req, res){
     try {   
         
         await connection.query(`DELETE FROM likes WHERE "postId"=$1 AND "userId"=$2`, [postId, userId])
+        res.sendStatus(200)
 
     } catch (error) {
         console.log(error)
@@ -65,8 +66,15 @@ async function removeLike (req, res){
 }
 async function teste (req,res){
 
-    const { userId } = res.locals.tokenData
-    res.send(userId)
+    let likeAmount = await connection.query(`
+        SELECT COUNT(*) AS "likeAmount" 
+        FROM likes
+        WHERE "postId"=$1
+        GROUP BY "postId"`
+        , [1])
+
+
+    res.send(likeAmount.rows[0].likeAmount)
 }
 
 export {likeAmount, insertLike, removeLike, teste}
