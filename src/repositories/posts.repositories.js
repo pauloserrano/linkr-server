@@ -14,21 +14,54 @@ const getPost = ({ id }) => {
 const getPosts = (offset=0, limit=20) => {
     return connection.query(`
         SELECT 
-            ${TABLES.POSTS}.${POSTS.ID}, 
-            ${TABLES.POSTS}.${POSTS.USER_ID},
-            ${TABLES.USERS}.${USERS.NAME}, 
-            ${TABLES.USERS}.${USERS.PICTURE_URL}, 
-            ${TABLES.POSTS}.${POSTS.LINK}, 
-            ${TABLES.POSTS}.${POSTS.BODY}, 
-            COUNT(${TABLES.POSTS}.${POSTS.ID}) - 1 AS reposts,
-            ${TABLES.POSTS}.${POSTS.META_TITLE}, 
-            ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
-            ${TABLES.POSTS}.${POSTS.META_IMAGE}
-        FROM ${TABLES.POSTS} 
-        JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
-        LEFT JOIN ${TABLES.SHARED} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID} 
-        GROUP BY ${TABLES.POSTS}.${POSTS.ID}, ${TABLES.USERS}.${USERS.ID}
-        ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
+            ${POSTS.ID},
+            ${POSTS.USER_ID},
+            ${POSTS.LINK}, 
+            ${POSTS.BODY},
+            ${POSTS.META_TITLE}, 
+            ${POSTS.META_DESCRIPTION},
+            ${POSTS.META_IMAGE},   
+            ${USERS.NAME},
+            ${USERS.PICTURE_URL},
+            reposts,
+            "isRepost"
+        FROM (
+            SELECT 
+                ${TABLES.POSTS}.${POSTS.ID}, 
+                ${TABLES.POSTS}.${POSTS.USER_ID},
+                ${TABLES.USERS}.${USERS.NAME}, 
+                ${TABLES.USERS}.${USERS.PICTURE_URL}, 
+                ${TABLES.POSTS}.${POSTS.LINK}, 
+                ${TABLES.POSTS}.${POSTS.BODY}, 
+                ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+                ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+                ${TABLES.POSTS}.${POSTS.META_IMAGE},
+                ${TABLES.POSTS}.${POSTS.CREATED_AT} AS timestamp,
+                (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
+                WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN FALSE END AS "isRepost"
+            FROM ${TABLES.POSTS} 
+            JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.POSTS}.${POSTS.USER_ID}
+        UNION
+            SELECT 
+                ${TABLES.POSTS}.${POSTS.ID}, 
+                ${TABLES.SHARED}.${POSTS.USER_ID},
+                ${TABLES.USERS}.${USERS.NAME}, 
+                ${TABLES.USERS}.${USERS.PICTURE_URL}, 
+                ${TABLES.POSTS}.${POSTS.LINK}, 
+                ${TABLES.POSTS}.${POSTS.BODY}, 
+                ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+                ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+                ${TABLES.POSTS}.${POSTS.META_IMAGE},
+                ${TABLES.SHARED}.${SHARED.CREATED_AT} AS timestamp,
+                (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
+                WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN TRUE END AS "isRepost"
+            FROM ${TABLES.SHARED}
+            JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.SHARED}.${SHARED.USER_ID}
+            JOIN ${TABLES.POSTS} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID}
+        ) AS timeline 
+        ORDER BY timeline.timestamp DESC
         LIMIT $1
         OFFSET $2;
     `, [limit, offset])
