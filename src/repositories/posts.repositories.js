@@ -21,6 +21,7 @@ const getRepost = ({ id }) => {
 
 const getPosts = ({ userId, offset, limit }) => {
     return connection.query(`
+<<<<<<< HEAD
         SELECT 
             ${POSTS.ID},
             ${POSTS.USER_ID},
@@ -80,6 +81,25 @@ const getPosts = ({ userId, offset, limit }) => {
         LIMIT $2
         OFFSET $3;
     `, [userId, limit || 20, offset || 0])
+=======
+        SELECT
+            ${TABLES.POSTS}.${POSTS.USER_ID},
+            ${TABLES.POSTS}.${POSTS.ID}, 
+            ${TABLES.POSTS}.${POSTS.USER_ID},
+            ${TABLES.USERS}.${USERS.NAME}, 
+            ${TABLES.USERS}.${USERS.PICTURE_URL}, 
+            ${TABLES.POSTS}.${POSTS.LINK}, 
+            ${TABLES.POSTS}.${POSTS.BODY}, 
+            ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+            ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+            ${TABLES.POSTS}.${POSTS.META_IMAGE}
+        FROM ${TABLES.POSTS} 
+        JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
+        ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
+        LIMIT $1
+        OFFSET $2;
+    `, [limit, offset])
+>>>>>>> main
 }
 
 

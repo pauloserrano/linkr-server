@@ -4,7 +4,7 @@ import {formatWhoLike} from "../repositories/like.repository.js"
 async function likeAmount (req, res){
 
     const postId = req.params?.postId
-    const userId = 1
+    const { userId } = res.locals.tokenData
 
     try {
 
@@ -35,12 +35,14 @@ async function likeAmount (req, res){
     
 }
 async function insertLike (req, res){
-
+    
     const postId = req.params?.postId
+    const { userId } = res.locals.tokenData
 
     try {   
         
-        await connection.query(`INSERT INTO likes ("postId", "userId") VALUES ($1, $2)`, [postId, 1])
+        await connection.query(`INSERT INTO likes ("postId", "userId") VALUES ($1, $2)`, [postId, userId])
+        res.sendStatus(200)
 
     } catch (error) {
         console.log(error)
@@ -50,10 +52,12 @@ async function insertLike (req, res){
 async function removeLike (req, res){
 
     const postId = req.params?.postId
-
+    const { userId } = res.locals.tokenData
+    
     try {   
         
-        await connection.query(`DELETE FROM likes WHERE "postId"=$1 AND "userId"=$2`, [postId, 1])
+        await connection.query(`DELETE FROM likes WHERE "postId"=$1 AND "userId"=$2`, [postId, userId])
+        res.sendStatus(200)
 
     } catch (error) {
         console.log(error)
@@ -61,8 +65,16 @@ async function removeLike (req, res){
     }
 }
 async function teste (req,res){
-    const teste = await formatWhoLike({postId:1, isLiked:true})
-    res.send(teste)
+
+    let likeAmount = await connection.query(`
+        SELECT COUNT(*) AS "likeAmount" 
+        FROM likes
+        WHERE "postId"=$1
+        GROUP BY "postId"`
+        , [1])
+
+
+    res.send(likeAmount.rows[0].likeAmount)
 }
 
 export {likeAmount, insertLike, removeLike, teste}

@@ -4,17 +4,15 @@ import dotenv from "dotenv"
 import hashtagRoute from "./routes/hashtag.route.js"
 import timelineRoutes from "./routes/posts.routes.js"
 import authRouter from "./routes/auth.router.js"
-import likeRoute from "./routes/likes.router.js"
-import userRoute from "./routes/user.router.js"
+import searchRouter from "./routes/search.router.js"
 
 dotenv.config()
 
 const app = express()
 app.use(cors(), json())
-app.use(authRouter);
+app.use(authRouter)
 app.use(timelineRoutes)
-app.use(likeRoute)
-app.use(userRoute)
+app.use(searchRouter)
 
 app.get('/status', (req, res) => {
     res.send('OK')
