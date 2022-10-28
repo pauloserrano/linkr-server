@@ -8,6 +8,4 @@ router.get("/ranking/hashtag", headersHashtagMiddleware, rankingHashtags)
 router.get("/ranking/hashtag/testes", rankingTeste)
 router.get("/search/hashtag/:hashtag", searchHashtagPost)
 
-
-
 export default router

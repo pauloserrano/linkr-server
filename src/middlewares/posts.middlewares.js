@@ -1,7 +1,8 @@
 import { STATUS } from "../enums/status.js"
 import postSchema from "../schemas/post.schema.js"
+import { getPost } from "../repositories/posts.repositories.js"
 
-const verifyPost = (req, res, next) => {
+const validatePost = (req, res, next) => {
     const { link, description } = req.body
     const isValid = postSchema.validate({ link, description }, { abortEarly: false })
 
@@ -13,4 +14,24 @@ const verifyPost = (req, res, next) => {
     next()
 }
 
-export { verifyPost }
+const verifyPost = async (req, res, next) => {
+    const { id } = req.params
+
+    try {
+        const { rows: [ post ] } = await getPost({ id })
+        
+        if (!post){
+            res.sendStatus(STATUS.NOT_FOUND)
+            return
+        }
+
+        res.locals.post = post
+        next()
+
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(STATUS.SERVER_ERROR)
+    }
+}
+
+export { validatePost, verifyPost }

@@ -8,6 +8,7 @@ import likeRouter from "./routes/likes.router.js"
 import userRouter from "./routes/user.router.js"
 import followsRouter from "./routes/follows.router.js"
 import searchRouter from "./routes/search.router.js"
+import followsRoutes from "./routes/follows.router.js"
 
 dotenv.config()
 
@@ -19,6 +20,7 @@ app.use(likeRouter)
 app.use(userRouter)
 app.use(followsRouter)
 app.use(searchRouter)
+app.use(followsRoutes)
 
 app.get('/status', (req, res) => {
     res.send('OK')

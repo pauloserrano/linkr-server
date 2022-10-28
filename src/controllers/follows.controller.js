@@ -6,9 +6,11 @@ async function allFollows (req, res){
 
     try {
         
-        const followsArray = await connection.query(`SELECT * FROM follows WHERE "userId"=$1`, [userId])
-
-        res.send(followsArray)
+        const { rows : followsArray } = await connection.query(`
+            SELECT follows."followedId" FROM follows WHERE "userId"=$1`
+        , [userId])
+        
+        res.send(followsArray.map(follow => follow.followedId))
 
     } catch (error) {
         console.log(error)
