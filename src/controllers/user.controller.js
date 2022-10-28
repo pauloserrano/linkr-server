@@ -24,4 +24,25 @@ async function UserPosts (req, res){
     
 }
 
-export {UserPosts}
+async function GetAllUsers (req, res){
+
+    const { userId } = res.locals.tokenData
+
+    try {
+        
+        const users = await connection.query(`
+        SELECT users.id, users.name, users."pictureUrl"
+        FROM users 
+        WHERE id!=$1
+        `
+        , [userId])
+
+        res.send(users.rows)
+        
+    } catch (error) {
+        console.log(error)
+        res.sendStatus(500)
+    }
+}
+
+export {UserPosts, GetAllUsers}
