@@ -1,4 +1,8 @@
 import connection from "../database/db.js";
+import { TABLES } from "../enums/tables.js"
+import { FIELDS } from "../enums/fields.js"
+
+const { POSTS, SHARED } = FIELDS
 
 async function rankingHashtags (req, res){
 
@@ -37,12 +41,22 @@ async function searchHashtagPost (req, res) {
         const hashtagName = req.params?.hashtag
 
         const hashtagArray = await connection.query(`
-        SELECT posts.link, posts.body, posts."userId",posts."metaTitle",posts."metaDescription",posts."metaImage",users."pictureUrl",posts.id
-        FROM "postsHashtags" 
-        JOIN hashtags ON "postsHashtags"."hashtagId" = hashtags.id
-        JOIN posts ON "postsHashtags"."postId" = posts.id
-        JOIN users ON posts."userId" = users.id
-        WHERE hashtags.name=$1;
+            SELECT 
+                posts.link, 
+                posts.body, 
+                posts."userId",
+                posts."metaTitle",
+                posts."metaDescription",
+                posts."metaImage",
+                users."pictureUrl",
+                posts.id,
+                (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
+                WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts
+            FROM "postsHashtags" 
+            JOIN hashtags ON "postsHashtags"."hashtagId" = hashtags.id
+            JOIN posts ON "postsHashtags"."postId" = posts.id
+            JOIN users ON posts."userId" = users.id
+            WHERE hashtags.name=$1;
         `, [hashtagName])
 
         res.send(hashtagArray.rows)
