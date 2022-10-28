@@ -2,7 +2,7 @@ import connection from "../database/db.js"
 import { TABLES } from "../enums/tables.js"
 import { FIELDS } from "../enums/fields.js"
 
-const { USERS, POSTS, COMMENTS, LIKES, POSTS_HASHTAGS, SHARED } = FIELDS
+const { USERS, POSTS, COMMENTS, LIKES, POSTS_HASHTAGS, SHARED, FOLLOWS } = FIELDS
 
 const getPost = ({ id }) => {
     return connection.query(`
@@ -11,25 +11,77 @@ const getPost = ({ id }) => {
     `, [id])
 }
 
-const getPosts = (offset=0, limit=20) => {
+
+const getRepost = ({ id }) => {
     return connection.query(`
-        SELECT
-            ${TABLES.POSTS}.${POSTS.USER_ID},
-            ${TABLES.POSTS}.${POSTS.ID}, 
-            ${TABLES.POSTS}.${POSTS.USER_ID},
-            ${TABLES.USERS}.${USERS.NAME}, 
-            ${TABLES.USERS}.${USERS.PICTURE_URL}, 
-            ${TABLES.POSTS}.${POSTS.LINK}, 
-            ${TABLES.POSTS}.${POSTS.BODY}, 
-            ${TABLES.POSTS}.${POSTS.META_TITLE}, 
-            ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
-            ${TABLES.POSTS}.${POSTS.META_IMAGE}
-        FROM ${TABLES.POSTS} 
-        JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
-        ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
-        LIMIT $1
-        OFFSET $2;
-    `, [limit, offset])
+        SELECT * FROM ${TABLES.SHARED} 
+        WHERE ${SHARED.ID} = $1;
+    `, [id])
+}
+
+const getPosts = ({ userId, offset, limit }) => {
+    return connection.query(`
+        SELECT 
+            ${POSTS.ID},
+            ${POSTS.USER_ID},
+            ${POSTS.LINK}, 
+            ${POSTS.BODY},
+            ${POSTS.META_TITLE}, 
+            ${POSTS.META_DESCRIPTION},
+            ${POSTS.META_IMAGE},   
+            ${USERS.NAME},
+            ${USERS.PICTURE_URL},
+            "repostId",
+            "reposts",
+            "isRepost"
+        FROM (
+            SELECT 
+                ${TABLES.POSTS}.${POSTS.ID}, 
+                ${TABLES.POSTS}.${POSTS.USER_ID},
+                ${TABLES.USERS}.${USERS.NAME}, 
+                ${TABLES.USERS}.${USERS.PICTURE_URL}, 
+                ${TABLES.POSTS}.${POSTS.LINK}, 
+                ${TABLES.POSTS}.${POSTS.BODY}, 
+                ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+                ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+                ${TABLES.POSTS}.${POSTS.META_IMAGE},
+                ${TABLES.POSTS}.${POSTS.CREATED_AT} AS timestamp,
+                (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
+                WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN 0 END AS "repostId",
+                CASE WHEN TRUE THEN FALSE END AS "isRepost"
+            FROM ${TABLES.POSTS} 
+            JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.POSTS}.${POSTS.USER_ID}
+            JOIN ${TABLES.FOLLOWS} ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.POSTS}.${POSTS.USER_ID}-- OR posts."userId" = $1
+            WHERE ${TABLES.FOLLOWS}.${FOLLOWS.USER_ID} = $1
+        UNION
+            SELECT 
+                ${TABLES.POSTS}.${POSTS.ID}, 
+                ${TABLES.SHARED}.${POSTS.USER_ID},
+                ${TABLES.USERS}.${USERS.NAME}, 
+                ${TABLES.USERS}.${USERS.PICTURE_URL}, 
+                ${TABLES.POSTS}.${POSTS.LINK}, 
+                ${TABLES.POSTS}.${POSTS.BODY}, 
+                ${TABLES.POSTS}.${POSTS.META_TITLE}, 
+                ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
+                ${TABLES.POSTS}.${POSTS.META_IMAGE},
+                ${TABLES.SHARED}.${SHARED.CREATED_AT} AS timestamp,
+                (SELECT COUNT(${TABLES.SHARED}.${SHARED.POST_ID}) FROM ${TABLES.SHARED} 
+                WHERE ${TABLES.SHARED}.${SHARED.POST_ID} = ${TABLES.POSTS}.${POSTS.ID}) AS reposts,
+                CASE WHEN TRUE THEN ${TABLES.SHARED}.${SHARED.ID} END AS "repostId",
+                CASE WHEN TRUE THEN TRUE END AS "isRepost"
+            FROM ${TABLES.SHARED}
+            JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.SHARED}.${SHARED.USER_ID}
+            JOIN ${TABLES.POSTS} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID}
+            JOIN ${TABLES.FOLLOWS} 
+                ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.USERS}.${USERS.ID} 
+                --OR posts."userId" = $1
+            WHERE ${TABLES.FOLLOWS}.${FOLLOWS.USER_ID} = $1
+        ) AS timeline 
+        ORDER BY timeline.timestamp DESC
+        LIMIT $2
+        OFFSET $3;
+    `, [userId, limit || 20, offset || 0])
 }
 
 
@@ -96,6 +148,7 @@ const updatePost = ({ id, body }) => {
 const getComments = ({ id }) => {
     return connection.query(`
         SELECT 
+            ${TABLES.USERS}.${USERS.ID},
             ${TABLES.USERS}.${USERS.PICTURE_URL},
             ${TABLES.USERS}.${USERS.NAME},
             ${TABLES.COMMENTS}.${COMMENTS.BODY}
@@ -118,4 +171,32 @@ const setComment = ({ id, userId, body }) => {
     `, [userId, id, body])
 }
 
-export { getPost, getPosts, setPost, deletePost, updatePost, getComments, setComment }
+const insertRepost = ({ id, userId }) => {
+    return connection.query(`
+        INSERT INTO ${TABLES.SHARED}
+        (
+            ${SHARED.POST_ID},
+            ${SHARED.USER_ID}
+        )
+        VALUES ($1, $2);
+    `,[id, userId])
+}
+
+const deleteRepost = ({ id }) => {
+    return connection.query(`
+        DELETE FROM ${TABLES.SHARED} WHERE ${SHARED.ID} = $1;
+    `, [id])
+}
+
+export { 
+    getPost, 
+    getPosts, 
+    setPost, 
+    deletePost, 
+    updatePost, 
+    getComments, 
+    setComment, 
+    insertRepost, 
+    deleteRepost,
+    getRepost
+}

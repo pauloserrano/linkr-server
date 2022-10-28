@@ -54,7 +54,13 @@ const FIELDS = Object.freeze({
         USER_ID: '"userId"',
         POST_ID: '"postId"',
         CREATED_AT: '"createdAt"'
-    }
+    },
+       
+    FOLLOWS: {
+        ID: "id",
+        USER_ID: '"userId"',
+        FOLLOWED_ID: '"followedId"',
+    },
 })
 
 export { FIELDS };

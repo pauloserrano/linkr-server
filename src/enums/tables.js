@@ -6,7 +6,8 @@ const TABLES = Object.freeze({
     POSTS_HASHTAGS: '"postsHashtags"',
     LIKES: "likes",
     COMMENTS: "comments",
-    SHARED: "shared"
+    SHARED: "shared",
+    FOLLOWS: "follows"
 })
 
 export { TABLES };
