@@ -21,7 +21,6 @@ const getRepost = ({ id }) => {
 
 const getPosts = ({ userId, offset, limit }) => {
     return connection.query(`
-<<<<<<< HEAD
         SELECT 
             ${POSTS.ID},
             ${POSTS.USER_ID},
@@ -74,32 +73,15 @@ const getPosts = ({ userId, offset, limit }) => {
             FROM ${TABLES.SHARED}
             JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID} = ${TABLES.SHARED}.${SHARED.USER_ID}
             JOIN ${TABLES.POSTS} ON ${TABLES.POSTS}.${POSTS.ID} = ${TABLES.SHARED}.${SHARED.POST_ID}
-            JOIN ${TABLES.FOLLOWS} ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.POSTS}.${POSTS.USER_ID}-- OR posts."userId" = $1
+            JOIN ${TABLES.FOLLOWS} 
+                ON ${TABLES.FOLLOWS}.${FOLLOWS.FOLLOWED_ID} = ${TABLES.USERS}.${USERS.ID} 
+                --OR posts."userId" = $1
             WHERE ${TABLES.FOLLOWS}.${FOLLOWS.USER_ID} = $1
         ) AS timeline 
         ORDER BY timeline.timestamp DESC
         LIMIT $2
         OFFSET $3;
     `, [userId, limit || 20, offset || 0])
-=======
-        SELECT
-            ${TABLES.POSTS}.${POSTS.USER_ID},
-            ${TABLES.POSTS}.${POSTS.ID}, 
-            ${TABLES.POSTS}.${POSTS.USER_ID},
-            ${TABLES.USERS}.${USERS.NAME}, 
-            ${TABLES.USERS}.${USERS.PICTURE_URL}, 
-            ${TABLES.POSTS}.${POSTS.LINK}, 
-            ${TABLES.POSTS}.${POSTS.BODY}, 
-            ${TABLES.POSTS}.${POSTS.META_TITLE}, 
-            ${TABLES.POSTS}.${POSTS.META_DESCRIPTION}, 
-            ${TABLES.POSTS}.${POSTS.META_IMAGE}
-        FROM ${TABLES.POSTS} 
-        JOIN ${TABLES.USERS} ON ${TABLES.USERS}.${USERS.ID}=${TABLES.POSTS}.${POSTS.USER_ID}
-        ORDER BY ${TABLES.POSTS}.${POSTS.CREATED_AT} DESC
-        LIMIT $1
-        OFFSET $2;
-    `, [limit, offset])
->>>>>>> main
 }
 
 
@@ -166,6 +148,7 @@ const updatePost = ({ id, body }) => {
 const getComments = ({ id }) => {
     return connection.query(`
         SELECT 
+            ${TABLES.USERS}.${USERS.ID},
             ${TABLES.USERS}.${USERS.PICTURE_URL},
             ${TABLES.USERS}.${USERS.NAME},
             ${TABLES.COMMENTS}.${COMMENTS.BODY}
